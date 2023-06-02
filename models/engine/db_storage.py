@@ -10,7 +10,8 @@ from models.amenity import Amenity
 from models.user import User
 from models.review import Review 
 from models.state import State
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
+
 
 classes = {
     'Amenity': Amenity,
@@ -33,7 +34,7 @@ class DBStorage:
         db_pwd = os.getenv('HBNB_MYSQL_PWD')
         db_host = os.getenv('HBNB_MYSQL_HOST')
         db = os.getenv('HBNB_MYSQL_DB')
-        db_url = 'mysql+mysqldb://db_user:db_pwd@db_host/db'
+        db_url = f'mysql+mysqldb://{db_user}:{db_pwd}@{db_host}/{db}'
         self.__engine = create_engine(db_url, pool_pre_ping=True)
 
         if os.getenv('HBNB_ENV') == 'test':
@@ -41,6 +42,8 @@ class DBStorage:
 
     def all(self, cls=None):
         """ query on the current database session all obejts depending on class name"""
+        if self.__session:
+            self.reload()
         dictionary = {}
         if cls:
             for obj in self.__session.query(cls).fetch_all():
@@ -49,5 +52,32 @@ class DBStorage:
                 dictionary[key] = value
                 return dictionary
         else:
-            pass
+            for cls in classes.values():
+                for obj in self.__session.query(cls):
+                    dictionary[obj.__class__.__name__ + '.' + obj.id] = obj
+        return dictionary
+    
+    def new(self, obj):
+        """create a new objects"""
+        self.__session.add(obj)
+
+    def save(self):
+        """commit al changes of the current database session"""
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        """ Delete object from current database session """
+        if not self.__session:
+            self.reload()
+        if obj:
+            self.__session.delete(obj)
+
+    def reload(self):
+        """reloads objects from the dtabase"""
+        session_factory = sessionmaker(bind=self.__engine, 
+                                       expire_on_commit=False)
+        Base.metadata.create_all(self.__engine)
+        self.__session = scoped_session(session_factory)
+
+    
         
