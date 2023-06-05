@@ -44,18 +44,17 @@ class DBStorage:
         """ query on the current database session all obejts depending on class name"""
         if self.__session:
             self.reload()
-        dictionary = {}
+        objects = {}
+        if type(cls) == str:
+            cls = classes.get(cls, None)
         if cls:
-            for obj in self.__session.query(cls).fetch_all():
-                key = cls + obj.id
-                value = obj
-                dictionary[key] = value
-                return dictionary
+            for obj in self.__session.query(cls):
+                objects[obj.__class__.__name__ + '.' + obj.id] = obj
         else:
             for cls in classes.values():
                 for obj in self.__session.query(cls):
-                    dictionary[obj.__class__.__name__ + '.' + obj.id] = obj
-        return dictionary
+                    objects[obj.__class__.__name__ + '.' + obj.id] = obj
+        return objects
     
     def new(self, obj):
         """create a new objects"""
@@ -78,6 +77,10 @@ class DBStorage:
                                        expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
         self.__session = scoped_session(session_factory)
+
+    def close(self):
+        """Dispose of current session if active"""
+        self.__session.remove()
 
     
         
