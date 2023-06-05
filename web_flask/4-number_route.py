@@ -31,10 +31,10 @@ def display_python(text='is cool'):
 
 
 @app.route('/number/<int:n>', strict_slashes=False)
-def number(n):
+def isNumber(n):
     """ return is the n is number """
     if isinstance(n, int):
-        return "{} is number".format(n)
+        return "{} is a number".format(n)
 
 
 if __name__ == '__main__':
