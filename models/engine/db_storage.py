@@ -8,7 +8,7 @@ from models.city import City
 from models.place import Place
 from models.amenity import Amenity
 from models.user import User
-from models.review import Review 
+from models.review import Review
 from models.state import State
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -41,7 +41,8 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """ query on the current database session all obejts depending on class name"""
+        """ query on the current database session all obejts
+        depending on class name"""
         if self.__session:
             self.reload()
         objects = {}
@@ -55,7 +56,7 @@ class DBStorage:
                 for obj in self.__session.query(cls):
                     objects[obj.__class__.__name__ + '.' + obj.id] = obj
         return objects
-    
+
     def new(self, obj):
         """create a new objects"""
         self.__session.add(obj)
@@ -73,7 +74,7 @@ class DBStorage:
 
     def reload(self):
         """reloads objects from the dtabase"""
-        session_factory = sessionmaker(bind=self.__engine, 
+        session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
         self.__session = scoped_session(session_factory)
@@ -81,6 +82,3 @@ class DBStorage:
     def close(self):
         """Dispose of current session if active"""
         self.__session.remove()
-
-    
-        
