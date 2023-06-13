@@ -28,6 +28,7 @@ FLUSH PRIVILEGES;
 
 USE hbnb_dev_db;
 
+
 --
 -- Table structure for table `cities`
 --

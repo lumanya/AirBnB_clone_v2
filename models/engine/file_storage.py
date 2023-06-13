@@ -1,6 +1,16 @@
 #!/usr/bin/python3
 """This module defines a class to manage file storage for hbnb clone"""
 import json
+from models.base_model import BaseModel
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
+from models.amenity import Amenity
+
+classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
+           "Place": Place, "Review": Review, "State": State, "User": User}
 
 
 class FileStorage:
@@ -68,3 +78,20 @@ class FileStorage:
     def close(self):
         """ Public method is the method that deserilize objscts"""
         self.reload()
+
+
+    def get(self, cls, id):
+        """Returns the object based on the class name and its ID, or None"""
+        if cls is None or id is None:
+            return None
+        else:
+            return self.all(cls).get(cls + '.' + id)
+        
+    def count(self, cls=None):
+        """Returns the number of objects in storage matching the given class"""
+        total = 0
+        if type(cls) == str and cls in classes:
+            total = len(self.all(cls))
+        elif cls is None:
+            total = len(self.__objects)
+        return total

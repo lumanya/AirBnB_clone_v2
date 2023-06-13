@@ -6,7 +6,7 @@ from datetime import datetime
 from os import path
 
 
-env.hosts = ['54.157.145.73', '52.91.145.8']
+env.hosts = ['100.25.19.204', '54.157.159.85']
 env.user = 'ubuntu'
 env.key_filename = '~/.ssh/id_rsa'
 
@@ -51,8 +51,6 @@ web_static_{}/web_static'
 web_static_{}/ /data/web_static/current'.format(timestamp))
         except:
                 return False
-        
-        print('New version deployed!')
 
         # return True on success
         return True
